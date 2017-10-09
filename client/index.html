@@ -1,13 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
     <script type="text/babel" >
         "use strict";
-    
+        
+        // Number for iterating
+        let myNum;
+        
+        // Socket variable
+        let socket;
+        
+        // Iterate the Counter
+        const iterate = (data) => {
+            document.querySelector("#iterator").innerText = data; 
+        };
+        
+        // Send data to server and increment personal counter
+        const incrementNum = () => {
+            myNum += 5;
+            document.querySelector("#myIterator").innerText = myNum;
+            
+            socket.emit('increment', 5);
+        };
+
+        // Set up socket and initialize values
+        const init = () => {
+           myNum = 0;
+           document.querySelector("#iterator").innerText = myNum;
+           document.querySelector("#myIterator").innerText = myNum;
+        
+           // Connect to the socket
+           socket = io.connect();
+            
+           // On Connect, start incrementing every 3 seconds
+           socket.on('connect', () => {
+               setInterval(incrementNum, 3000);
+           });
+            
+           // When the socket emits iterate, call iterate function
+           socket.on('iterate', iterate);
+        };
+
+        window.onload = init;
     </script>
 </head>
 <body>
-
+    <h1>Counter: <span id="iterator"></span></h1>
+    <h1>Personal Counter: <span id="myIterator"></span></h1>
 </body>
 </html>
